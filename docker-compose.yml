@@ -1,0 +1,16 @@
+services:
+  laravel:
+    image: laravelsail/php83-composer:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/var/www/html
+    environment:
+      - WWWUSER=1000
+    networks:
+      - sail
+    command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+
+networks:
+  sail:
+    driver: bridge
