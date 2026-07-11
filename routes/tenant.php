@@ -7,6 +7,8 @@ use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\ProfileController;
 
+$tenantDomain = '{tenant}.'.config('app.central_domain', 'rentivo.my.id');
+
 /*
 |--------------------------------------------------------------------------
 | Tenant Routes
@@ -23,7 +25,7 @@ Route::middleware([
     'web',
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
-])->group(function () {
+])->domain($tenantDomain)->group(function () {
     require __DIR__.'/auth.php';
 
     Route::middleware('auth')->group(function () {
@@ -59,7 +61,7 @@ Route::middleware([
     'auth',
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
-])->prefix('admin')->name('admin.')->group(function () {
+])->domain($tenantDomain)->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     
