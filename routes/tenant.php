@@ -79,6 +79,9 @@ Route::middleware([
     Route::get('/booking', [\App\Http\Controllers\Admin\BookingController::class, 'index'])->name('bookings.index');
     Route::get('/booking/create', [\App\Http\Controllers\Admin\BookingController::class, 'create'])->name('bookings.create');
     Route::post('/booking', [\App\Http\Controllers\Admin\BookingController::class, 'store'])->name('bookings.store');
+    Route::post('/booking/bulk-update', [\App\Http\Controllers\Admin\BookingController::class, 'bulkUpdate'])->name('bookings.bulk-update');
+    Route::get('/booking/{booking}/edit', [\App\Http\Controllers\Admin\BookingController::class, 'edit'])->name('bookings.edit');
+    Route::put('/booking/{booking}', [\App\Http\Controllers\Admin\BookingController::class, 'update'])->name('bookings.update');
     Route::get('/booking/{booking}', [\App\Http\Controllers\Admin\BookingController::class, 'show'])->name('bookings.show');
     
     // Booking actions

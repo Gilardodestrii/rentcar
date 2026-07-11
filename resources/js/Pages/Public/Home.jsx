@@ -1,208 +1,92 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import GuestLayout from '@/Layouts/GuestLayout';
 
-export default function Home({ featuredCars, testimonials, settings }) {
+export default function Home({ settings }) {
     return (
-        <GuestLayout>
-            <Head title={settings.site_name} />
-            
+        <GuestLayout settings={settings}>
             {/* Hero Section */}
-            <section className="relative h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-indigo-900">
-                {settings.hero_image && (
-                    <div 
-                        className="absolute inset-0 bg-cover bg-center opacity-30"
-                        style={{ backgroundImage: `url(${settings.hero_image})` }}
-                    />
-                )}
-                <div className="relative z-10 text-center px-4">
-                    <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
-                        {settings.hero_title}
-                    </h1>
-                    <p className="text-xl md:text-2xl text-gray-200 mb-8">
-                        {settings.hero_subtitle}
-                    </p>
-                    <div className="flex gap-4 justify-center">
-                        <Link 
-                            href={route('public.catalog')}
-                            className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
-                        >
-                            Lihat Armada
-                        </Link>
-                        <Link 
-                            href={route('public.booking')}
-                            className="px-8 py-3 bg-white hover:bg-gray-100 text-blue-900 font-semibold rounded-lg transition"
-                        >
-                            Booking Sekarang
-                        </Link>
+            <div className="relative overflow-hidden bg-blue-600">
+                <div className="absolute inset-0">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-800 mix-blend-multiply" />
+                </div>
+                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                        <div>
+                            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight">
+                                {settings?.hero_title || 'Solusi Rental Mobil Terbaik'}
+                            </h1>
+                            <p className="mt-6 text-lg text-blue-100 max-w-xl">
+                                {settings?.hero_subtitle || 'Armada lengkap, harga terjangkau, dan pelayanan profesional untuk perjalanan bisnis maupun wisata Anda.'}
+                            </p>
+                            <div className="mt-10 flex flex-col sm:flex-row gap-4">
+                                <Link
+                                    href="/katalog"
+                                    className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-lg text-blue-600 bg-white hover:bg-blue-50 transition-colors shadow-lg"
+                                >
+                                    Lihat Katalog
+                                </Link>
+                                <Link
+                                    href="/booking"
+                                    className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-500 hover:bg-blue-400 transition-colors shadow-lg"
+                                >
+                                    Booking Sekarang
+                                </Link>
+                            </div>
+                        </div>
+                        <div className="hidden lg:block relative">
+                            <div className="aspect-w-16 aspect-h-9 bg-blue-500/20 rounded-2xl backdrop-blur-sm border border-white/20 p-8 shadow-2xl">
+                                <div className="grid grid-cols-2 gap-4">
+                                    {[
+                                        { label: 'Armada', value: '50+', icon: 'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4' },
+                                        { label: 'Pelanggan', value: '1.2k', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z' },
+                                        { label: 'Rating', value: '4.9', icon: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z' },
+                                        { label: 'Kota', value: '12', icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' }
+                                    ].map((stat, i) => (
+                                        <div key={i} className="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
+                                            <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mb-3">
+                                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={stat.icon} />
+                                                </svg>
+                                            </div>
+                                            <p className="text-2xl font-bold text-white">{stat.value}</p>
+                                            <p className="text-blue-200 text-sm">{stat.label}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            {/* Featured Cars Section */}
-            <section className="py-16 bg-gray-50">
-                <div className="max-w-7xl mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-center mb-12">Armada Pilihan</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {featuredCars.map((car) => (
-                            <Link 
-                                key={car.id}
-                                href={route('public.cars.show', car.id)}
-                                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition group"
-                            >
-                                <div className="aspect-video bg-gray-200 overflow-hidden">
-                                    {car.photo ? (
-                                        <img 
-                                            src={car.photo} 
-                                            alt={`${car.brand} ${car.model}`}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                            No Photo
-                                        </div>
-                                    )}
+            {/* Features */}
+            <div className="py-24 bg-white">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center">
+                        <h2 className="text-base text-blue-600 font-semibold tracking-wide uppercase">Mengapa RenCar?</h2>
+                        <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                            Pelayanan Terbaik Untuk Anda
+                        </p>
+                    </div>
+                    <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {[
+                            { title: 'Armada Berkualitas', desc: 'Mobil selalu dalam kondisi prima dan terawat dengan baik.' },
+                            { title: 'Harga Transparan', desc: 'Tidak ada biaya tersembunyi, harga yang kami cantumkan adalah harga final.' },
+                            { title: 'Layanan 24/7', desc: 'Tim support kami siap membantu Anda kapan saja dan dimana saja.' }
+                        ].map((feature, i) => (
+                            <div key={i} className="relative p-8 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 -mt-1 w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
                                 </div>
-                                <div className="p-4">
-                                    <h3 className="text-lg font-semibold">{car.brand} {car.model}</h3>
-                                    <div className="flex items-center gap-4 text-sm text-gray-600 mt-2">
-                                        <span className="flex items-center gap-1">
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                            </svg>
-                                            {car.capacity} orang
-                                        </span>
-                                        <span className="capitalize">{car.transmission}</span>
-                                    </div>
-                                    <div className="mt-3 flex items-center justify-between">
-                                        <span className="text-xl font-bold text-blue-600">
-                                            Rp {car.price_per_day.toLocaleString('id-ID')}/hari
-                                        </span>
-                                        <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">
-                                            Tersedia
-                                        </span>
-                                    </div>
-                                </div>
-                            </Link>
+                                <h3 className="mt-4 text-xl font-bold text-gray-900 text-center">{feature.title}</h3>
+                                <p className="mt-3 text-gray-500 text-center">{feature.desc}</p>
+                            </div>
                         ))}
                     </div>
-                    <div className="text-center mt-8">
-                        <Link 
-                            href={route('public.catalog')}
-                            className="text-blue-600 hover:text-blue-700 font-semibold"
-                        >
-                            Lihat Semua Mobil →
-                        </Link>
-                    </div>
                 </div>
-            </section>
-
-            {/* Why Choose Us Section */}
-            <section className="py-16 bg-white">
-                <div className="max-w-7xl mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-center mb-12">Mengapa Memilih Kami?</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div className="text-center p-6">
-                            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <h3 className="text-xl font-semibold mb-2">Armada Terawat</h3>
-                            <p className="text-gray-600">Semua mobil kami dalam kondisi prima dan terawat rutin</p>
-                        </div>
-                        <div className="text-center p-6">
-                            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <h3 className="text-xl font-semibold mb-2">Harga Transparan</h3>
-                            <p className="text-gray-600">Tidak ada biaya tersembunyi, harga sesuai yang tertera</p>
-                        </div>
-                        <div className="text-center p-6">
-                            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-                                </svg>
-                            </div>
-                            <h3 className="text-xl font-semibold mb-2">Layanan 24 Jam</h3>
-                            <p className="text-gray-600">Tim support siap membantu kapanpun Anda butuhkan</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Testimonials Section */}
-            {testimonials.length > 0 && (
-                <section className="py-16 bg-gray-50">
-                    <div className="max-w-7xl mx-auto px-4">
-                        <h2 className="text-3xl font-bold text-center mb-12">Apa Kata Mereka?</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {testimonials.map((testimonial) => (
-                                <div key={testimonial.id} className="bg-white p-6 rounded-xl shadow">
-                                    <div className="flex items-center gap-1 mb-3">
-                                        {[...Array(5)].map((_, i) => (
-                                            <svg 
-                                                key={i}
-                                                className={`w-5 h-5 ${i < testimonial.rating ? 'text-yellow-400' : 'text-gray-300'}`}
-                                                fill="currentColor"
-                                                viewBox="0 0 20 20"
-                                            >
-                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
-                                        ))}
-                                    </div>
-                                    <p className="text-gray-600 mb-4">"{testimonial.comment}"</p>
-                                    <div className="flex items-center justify-between">
-                                        <span className="font-semibold">{testimonial.customer_name}</span>
-                                        {testimonial.car && (
-                                            <span className="text-sm text-gray-500">{testimonial.car}</span>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-            )}
-
-            {/* About Section */}
-            {settings.about_content && (
-                <section className="py-16 bg-white">
-                    <div className="max-w-3xl mx-auto px-4">
-                        <h2 className="text-3xl font-bold text-center mb-8">{settings.about_title}</h2>
-                        <div className="prose prose-lg mx-auto text-gray-600">
-                            {settings.about_content}
-                        </div>
-                    </div>
-                </section>
-            )}
-
-            {/* CTA Section */}
-            <section className="py-16 bg-blue-600">
-                <div className="max-w-4xl mx-auto px-4 text-center">
-                    <h2 className="text-3xl font-bold text-white mb-4">Siap Memulai Perjalanan Anda?</h2>
-                    <p className="text-blue-100 mb-8">Hubungi kami sekarang atau langsung booking melalui website</p>
-                    <div className="flex gap-4 justify-center">
-                        <Link 
-                            href={route('public.booking')}
-                            className="px-8 py-3 bg-white hover:bg-gray-100 text-blue-600 font-semibold rounded-lg transition"
-                        >
-                            Booking Online
-                        </Link>
-                        {settings.company_whatsapp && (
-                            <a 
-                                href={`https://wa.me/${settings.company_whatsapp.replace(/[^0-9]/g, '')}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="px-8 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition"
-                            >
-                                Hubungi via WhatsApp
-                            </a>
-                        )}
-                    </div>
-                </div>
-            </section>
+            </div>
         </GuestLayout>
     );
 }

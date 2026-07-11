@@ -139,6 +139,44 @@ export default function CarsIndex({ cars, filters }) {
                         ))}
                     </div>
 
+                    {/* Pagination */}
+                    {cars.data.length > 0 && cars.links && cars.links.length > 0 && (
+                        <div className="mt-6 flex justify-center gap-1">
+                            {cars.links.map((link, idx) => {
+                                const isDisabled = !link.url;
+                                const isActive = link.active;
+                                const isPrev = link.label.includes('Previous');
+                                const isNext = link.label.includes('Next');
+
+                                if (isDisabled) {
+                                    return (
+                                        <button
+                                            key={idx}
+                                            disabled
+                                            className="px-3 py-2 text-sm text-gray-300 bg-gray-100 rounded-lg cursor-not-allowed"
+                                        >
+                                            {isPrev ? '← Prev' : isNext ? 'Next →' : link.label}
+                                        </button>
+                                    );
+                                }
+
+                                return (
+                                    <Link
+                                        key={idx}
+                                        href={link.url}
+                                        className={`px-3 py-2 text-sm rounded-lg transition ${
+                                            isActive
+                                                ? 'bg-blue-600 text-white font-semibold'
+                                                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        {isPrev ? '← Prev' : isNext ? 'Next →' : link.label}
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    )}
+
                     {cars.data.length === 0 && (
                         <div className="bg-white rounded-lg shadow-sm p-12 text-center">
                             <p className="text-gray-500">Belum ada mobil.</p>
