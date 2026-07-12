@@ -8,6 +8,7 @@ import Alert from '@/Components/UI/Alert';
 
 export default function CarsEdit({ car }) {
     const { data, setData, post, processing, errors } = useForm({
+        _method: 'put',
         brand: car.brand || '',
         model: car.model || '',
         category: car.category || '',
@@ -15,6 +16,7 @@ export default function CarsEdit({ car }) {
         capacity: car.capacity || '',
         transmission: car.transmission || '',
         price_per_day: car.price_per_day || '',
+        status: car.status || 'available',
         description: car.description || '',
         photos: [],
         delete_photos: []

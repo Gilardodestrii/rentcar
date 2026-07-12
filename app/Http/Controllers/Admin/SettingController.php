@@ -9,62 +9,73 @@ use Inertia\Response;
 
 class SettingController extends Controller
 {
+    // Canonical map: frontend field name -> SiteSetting key
+    private const MAP = [
+        'site_name'       => 'site.name',
+        'site_tagline'    => 'site.tagline',
+        'site_logo'       => 'site.logo',
+        'hero_title'      => 'hero.title',
+        'hero_subtitle'   => 'hero.subtitle',
+        'hero_image'      => 'hero.image',
+        'about_title'     => 'about.title',
+        'about_content'   => 'about.content',
+        'company_phone'   => 'company.phone',
+        'company_email'   => 'company.email',
+        'company_address' => 'company.address',
+        'company_whatsapp'=> 'company.whatsapp',
+        'social_facebook' => 'social.facebook',
+        'social_instagram'=> 'social.instagram',
+        'social_twitter'  => 'social.twitter',
+    ];
+
     public function index(): Response
     {
-        $settings = [
-            'site_name' => SiteSetting::get('site.name', 'RenCar'),
-            'site_tagline' => SiteSetting::get('site.tagline', 'Sistem Rental Mobil Professional'),
-            'site_logo' => SiteSetting::get('site.logo'),
-            'company_phone' => SiteSetting::get('company.phone'),
-            'company_email' => SiteSetting::get('company.email'),
-            'company_address' => SiteSetting::get('company.address'),
-            'company_whatsapp' => SiteSetting::get('company.whatsapp'),
-            'social_facebook' => SiteSetting::get('social.facebook'),
-            'social_instagram' => SiteSetting::get('social.instagram'),
-            'social_twitter' => SiteSetting::get('social.twitter'),
-            'hero_title' => SiteSetting::get('hero.title', 'Rental Mobil Terpercaya'),
-            'hero_subtitle' => SiteSetting::get('hero.subtitle', 'Armada lengkap, harga terjangkau'),
-            'hero_image' => SiteSetting::get('hero.image'),
-            'about_title' => SiteSetting::get('about.title', 'Tentang Kami'),
-            'about_content' => SiteSetting::get('about.content'),
-        ];
+        $settings = [];
+        foreach (self::MAP as $field => $key) {
+            $settings[$field] = SiteSetting::get($key);
+        }
 
-        return inertia('Admin/Settings/Index', [
-            'settings' => $settings,
-        ]);
+        // Prefix storage path for images
+        foreach (['site_logo', 'hero_image'] as $img) {
+            if ($settings[$img]) {
+                $settings[$img . '_url'] = asset('storage/' . $settings[$img]);
+            }
+        }
+
+        return inertia('Admin/Settings/Index', ['settings' => $settings]);
     }
 
     public function update(Request $request)
     {
-        $validated = $request->validate([
-            'site_name' => 'nullable|string|max:100',
-            'site_tagline' => 'nullable|string|max:200',
-            'site_logo' => 'nullable|image|mimes:png,jpg,svg|max:1024',
-            'company_phone' => 'nullable|string|max:20',
-            'company_email' => 'nullable|email|max:100',
-            'company_address' => 'nullable|string|max:500',
+        $request->validate([
+            'site_name'        => 'nullable|string|max:100',
+            'site_tagline'     => 'nullable|string|max:200',
+            'site_logo'        => 'nullable|image|mimes:png,jpg,svg,webp|max:1024',
+            'hero_title'       => 'nullable|string|max:100',
+            'hero_subtitle'    => 'nullable|string|max:200',
+            'hero_image'       => 'nullable|image|mimes:jpg,png,webp|max:3072',
+            'about_title'      => 'nullable|string|max:100',
+            'about_content'    => 'nullable|string|max:2000',
+            'company_phone'    => 'nullable|string|max:20',
+            'company_email'    => 'nullable|email|max:100',
+            'company_address'  => 'nullable|string|max:500',
             'company_whatsapp' => 'nullable|string|max:20',
-            'social_facebook' => 'nullable|url|max:200',
-            'social_instagram' => 'nullable|url|max:200',
-            'social_twitter' => 'nullable|url|max:200',
-            'hero_title' => 'nullable|string|max:100',
-            'hero_subtitle' => 'nullable|string|max:200',
-            'hero_image' => 'nullable|image|mimes:jpg,png,webp|max:2048',
-            'about_title' => 'nullable|string|max:100',
-            'about_content' => 'nullable|string|max:2000',
+            'social_facebook'  => 'nullable|max:200',
+            'social_instagram' => 'nullable|max:200',
+            'social_twitter'   => 'nullable|max:200',
         ]);
 
-        foreach ($validated as $key => $value) {
-            if ($value === null) continue;
-
-            // Handle file uploads
-            if ($request->hasFile($key)) {
-                $path = $request->file($key)->store('settings', 'public');
+        foreach (self::MAP as $field => $key) {
+            if ($request->hasFile($field)) {
+                // Delete old file if exists
+                $old = SiteSetting::get($key);
+                if ($old) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($old);
+                }
+                $path = $request->file($field)->store('settings', 'public');
                 SiteSetting::set($key, $path);
-            } else {
-                // Convert snake_case to dot notation (site_name -> site.name)
-                $settingKey = str_replace('_', '.', $key);
-                SiteSetting::set($settingKey, $value);
+            } elseif ($request->exists($field) && $request->input($field) !== null) {
+                SiteSetting::set($key, $request->input($field));
             }
         }
 
