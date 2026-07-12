@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Inertia\Middleware;
@@ -23,6 +24,17 @@ class HandleInertiaRequests extends Middleware
         return parent::version($request);
     }
 
+    public function handle(Request $request, Closure $next)
+    {
+        $tenant = $request->route('tenant');
+
+        if ($tenant) {
+            URL::defaults(['tenant' => $tenant]);
+        }
+
+        return parent::handle($request, $next);
+    }
+
     /**
      * Define the props that are shared by default.
      *
@@ -30,8 +42,6 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        URL::defaults(['tenant' => $request->route('tenant')]);
-
         return [
             ...parent::share($request),
             'auth' => [
