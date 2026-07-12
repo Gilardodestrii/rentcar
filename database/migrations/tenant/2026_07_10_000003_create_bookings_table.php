@@ -13,13 +13,15 @@ return new class extends Migration
             $table->string('booking_code')->unique();
             $table->foreignId('car_id')->constrained();
             $table->foreignId('driver_id')->nullable()->constrained();
-            $table->enum('rental_type', ['self_drive', 'with_driver'])->default('self_drive');
+            $table->enum('rental_type', ['leasing', 'with_driver'])->default('leasing');
             $table->string('customer_name');
             $table->string('customer_phone');
             $table->string('customer_email')->nullable();
-            $table->string('ktp_photo')->nullable(); // path upload foto KTP
+            $table->string('ktp_path')->nullable();
             $table->dateTime('start_date');
             $table->dateTime('end_date');
+            $table->string('pickup_location')->nullable();
+            $table->string('dropoff_location')->nullable();
             $table->decimal('subtotal', 15, 2);
             $table->decimal('driver_fee', 15, 2)->default(0);
             $table->decimal('total_price', 15, 2);
