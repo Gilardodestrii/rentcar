@@ -6,14 +6,14 @@ export default function Catalog({ cars, filters, settings }) {
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [category, setCategory] = useState(filters?.category || '');
     const [transmission, setTransmission] = useState(filters?.transmission || '');
-    const [sortBy, setSortBy] = useState(filters?.sort || 'price_asc');
+    const [sortBy, setSortBy] = useState(filters?.sort_by || 'latest');
 
     const handleFilter = () => {
         router.get('/katalog', {
             search: searchTerm,
             category,
             transmission,
-            sort: sortBy,
+            sort_by: sortBy,
         }, { preserveState: true });
     };
 
@@ -88,9 +88,9 @@ export default function Catalog({ cars, filters, settings }) {
                                     onChange={(e) => setSortBy(e.target.value)}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                                 >
-                                    <option value="price_asc">Harga: Rendah - Tinggi</option>
-                                    <option value="price_desc">Harga: Tinggi - Rendah</option>
-                                    <option value="name_asc">Nama: A - Z</option>
+                                    <option value="latest">Terbaru</option>
+                                    <option value="price_low">Harga: Rendah - Tinggi</option>
+                                    <option value="price_high">Harga: Tinggi - Rendah</option>
                                 </select>
                             </div>
                         </div>
@@ -111,9 +111,9 @@ export default function Catalog({ cars, filters, settings }) {
                                 <div key={car.id} className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow overflow-hidden border border-gray-200">
                                     {/* Car Image */}
                                     <div className="relative h-48 bg-gray-200">
-                                        {car.primary_photo ? (
+                                        {car.photo ? (
                                             <img
-                                                src={car.primary_photo}
+                                                src={car.photo}
                                                 alt={`${car.brand} ${car.model}`}
                                                 className="w-full h-full object-cover"
                                             />
@@ -157,7 +157,7 @@ export default function Catalog({ cars, filters, settings }) {
                                                 <p className="text-xs text-gray-500">per hari</p>
                                             </div>
                                             <Link
-                                                href={`/katalog/${car.id}`}
+                                                href={`/mobil/${car.id}`}
                                                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors text-sm"
                                             >
                                                 Detail

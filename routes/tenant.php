@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\ForgetTenantRouteParameter;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\ProfileController;
@@ -25,7 +26,8 @@ Route::middleware([
     'web',
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
-])->scopeBindings()->domain($tenantDomain)->group(function () {
+    ForgetTenantRouteParameter::class,
+])->domain($tenantDomain)->group(function () {
     require __DIR__.'/auth.php';
 
     Route::middleware('auth')->group(function () {
@@ -61,7 +63,8 @@ Route::middleware([
     'auth',
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
-])->scopeBindings()->domain($tenantDomain)->prefix('admin')->name('admin.')->group(function () {
+    ForgetTenantRouteParameter::class,
+])->domain($tenantDomain)->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     
