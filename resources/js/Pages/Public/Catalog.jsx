@@ -9,12 +9,12 @@ export default function Catalog({ cars, filters, settings }) {
     const [sortBy, setSortBy] = useState(filters?.sort_by || 'latest');
 
     const handleFilter = () => {
-        router.get('/katalog', {
+        router.get(route('public.catalog'), {
             search: searchTerm,
-            category,
-            transmission,
+            category: category,
+            transmission: transmission,
             sort_by: sortBy,
-        }, { preserveState: true });
+        }, { preserveState: true, replace: true });
     };
 
     const getStatusBadge = (status) => {
