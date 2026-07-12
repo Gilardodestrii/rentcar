@@ -29,21 +29,10 @@ return new class extends Migration
 
             $table->index(['car_id', 'start_date', 'end_date']);
         });
-
-        // Blokir jadwal mobil (servis/maintenance)
-        Schema::create('car_blocks', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('car_id')->constrained()->cascadeOnDelete();
-            $table->dateTime('start_date');
-            $table->dateTime('end_date');
-            $table->string('reason')->nullable();
-            $table->timestamps();
-        });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('car_blocks');
         Schema::dropIfExists('bookings');
     }
 };
