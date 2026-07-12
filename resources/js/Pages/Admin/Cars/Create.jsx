@@ -1,4 +1,4 @@
-import { Head, Link, useForm, router } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useState } from 'react';
 import Button from '@/Components/UI/Button';
@@ -6,7 +6,7 @@ import Alert from '@/Components/UI/Alert';
 import LoadingOverlay from '@/Components/LoadingOverlay';
 
 export default function CarsCreate() {
-    const { data, setData, post, processing, errors } = useForm({
+    const initialData = {
         brand: '',
         model: '',
         category: '',
@@ -14,18 +14,18 @@ export default function CarsCreate() {
         capacity: '',
         transmission: '',
         price_per_day: '',
+        status: 'available',
         description: '',
         photos: []
-    });
+    };
+
+    const { data, setData, post, processing, errors, reset } = useForm(initialData);
 
     const [previews, setPreviews] = useState([]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('admin.cars.store'), {
-            preserveScroll: true,
-            onStart: () => router.visit(route('admin.cars.index'), { preserveScroll: true }),
-        });
+        post(route('admin.cars.store'));
     };
 
     const handlePhotoChange = (e) => {
@@ -250,7 +250,7 @@ export default function CarsCreate() {
                                     ← Kembali ke Daftar Mobil
                                 </Link>
                                 <div className="flex items-center gap-3">
-                                    <Button variant="outline" onClick={() => setData({ ...data, brand: '', model: '', category: '', plate_number: '', capacity: '', transmission: '', price_per_day: '', description: '', photos: [] })}>
+                                    <Button variant="outline" onClick={() => { reset(); setPreviews([]); }}>
                                         Reset
                                     </Button>
                                     <Button type="submit" variant="primary" disabled={processing} className="min-w-[80px]">
