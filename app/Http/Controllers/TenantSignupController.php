@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Tenant;
 use App\Models\User;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class TenantSignupController extends Controller
 {
@@ -20,7 +20,7 @@ class TenantSignupController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): SymfonyResponse
     {
         $baseDomain = config('app.central_domain', parse_url(config('app.url'), PHP_URL_HOST));
 
@@ -56,6 +56,6 @@ class TenantSignupController extends Controller
         ]);
         tenancy()->end();
 
-        return redirect()->away("https://{$domain}/login");
+        return Inertia::location("https://{$domain}/login");
     }
 }
