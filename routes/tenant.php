@@ -25,7 +25,7 @@ Route::middleware([
     'web',
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
-])->domain($tenantDomain)->group(function () {
+])->scopeBindings()->domain($tenantDomain)->group(function () {
     require __DIR__.'/auth.php';
 
     Route::middleware('auth')->group(function () {
@@ -61,7 +61,7 @@ Route::middleware([
     'auth',
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
-])->domain($tenantDomain)->prefix('admin')->name('admin.')->group(function () {
+])->scopeBindings()->domain($tenantDomain)->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     
