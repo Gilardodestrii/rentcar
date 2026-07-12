@@ -35,7 +35,7 @@ export default function GuestLayout({ children, settings = {} }) {
                                 <Link href="/booking" className="text-gray-600 hover:text-gray-900 transition-colors font-medium">Booking</Link>
                                 <Link href="/cek-status" className="text-gray-600 hover:text-gray-900 transition-colors font-medium">Cek Status</Link>
                                 <Link 
-                                    href={route('login')} 
+                                    href="/login" 
                                     className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium"
                                 >
                                     Login Admin
@@ -65,7 +65,7 @@ export default function GuestLayout({ children, settings = {} }) {
                                     <Link href="/katalog" className="text-gray-600 hover:text-gray-900 transition-colors font-medium px-2 py-2">Katalog</Link>
                                     <Link href="/booking" className="text-gray-600 hover:text-gray-900 transition-colors font-medium px-2 py-2">Booking</Link>
                                     <Link href="/cek-status" className="text-gray-600 hover:text-gray-900 transition-colors font-medium px-2 py-2">Cek Status</Link>
-                                    <Link href={route('login')} className="text-blue-600 hover:text-blue-700 transition-colors font-medium px-2 py-2">Login Admin</Link>
+                                    <Link href="/login" className="text-blue-600 hover:text-blue-700 transition-colors font-medium px-2 py-2">Login Admin</Link>
                                 </div>
                             </div>
                         )}

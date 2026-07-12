@@ -8,7 +8,7 @@ export default function VerifyEmail({ status }) {
     const submit = (e) => {
         e.preventDefault();
 
-        post(route('verification.send'));
+        post('/email/verification-notification');
     };
 
     return (
