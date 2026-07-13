@@ -31,6 +31,9 @@ class AppServiceProvider extends ServiceProvider
 
         Vite::prefetch(concurrency: 3);
 
+        // Load Midtrans configuration
+        $this->app->make('config')->set('midtrans', require config_path('midtrans.php'));
+
         // Sync tenant storage to public on file upload
         Storage::extend('tenant_public', function ($app, $config) {
             $tenantId = $config['tenant_id'] ?? 'central';

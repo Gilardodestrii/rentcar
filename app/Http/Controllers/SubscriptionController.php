@@ -4,17 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Subscription;
 use App\Models\Tenant;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 use Midtrans\Config as MidtransConfig;
 use Midtrans\Snap;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\HttpFoundation\Response;
 
-class TenantSignupController extends Controller
+class SubscriptionController extends Controller
 {
     public function __construct()
     {
@@ -25,87 +22,25 @@ class TenantSignupController extends Controller
         MidtransConfig::$is3ds = true;
     }
 
-    public function create(): Response
-    {
-        return Inertia::render('Central/TenantSignup', [
-            'baseDomain' => config('app.central_domain', parse_url(config('app.url'), PHP_URL_HOST)),
-        ]);
-    }
-
-    public function store(Request $request): SymfonyResponse
-    {
-        $baseDomain = config('app.central_domain', parse_url(config('app.url'), PHP_URL_HOST));
-
-        $validated = $request->validate([
-            'company_name' => ['required', 'string', 'max:100'],
-            'slug' => [
-                'required',
-                'string',
-                'min:3',
-                'max:32',
-                'regex:/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/',
-                Rule::unique('tenants', 'id'),
-            ],
-            'name' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email', 'max:100'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'phone' => ['nullable', 'string', 'max:20'],
-            'plan' => ['required', 'string', 'in:Starter,Professional,Enterprise'],
-        ]);
-
-        $domain = "{$validated['slug']}.{$baseDomain}";
-
-        $tenant = Tenant::create([
-            'id' => $validated['slug'],
-            'data' => [
-                'company_name' => $validated['company_name'],
-                'phone' => $validated['phone'],
-                'email' => $validated['email'],
-                'plan' => $validated['plan'],
-            ],
-        ]);
-
-        $tenant->domains()->create(['domain' => $domain]);
-
-        tenancy()->initialize($tenant);
-        User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
-        tenancy()->end();
-
-        // Create subscription with trial period
-        Subscription::create([
-            'tenant_id' => $tenant->id,
-            'plan' => $validated['plan'],
-            'amount' => $this->getPlanPrice($validated['plan']),
-            'status' => 'trial',
-            'payment_method' => 'trial',
-            'payment_reference' => 'TRIAL-' . strtoupper(uniqid()),
-            'expires_at' => now()->addDays(7),
-        ]);
-
-        return Inertia::location("https://{$domain}/login");
-    }
-
     /**
-     * Create subscription with payment for existing tenant
+     * Create a new subscription and payment transaction
      */
-    public function createSubscription(Request $request, Tenant $tenant): SymfonyResponse
+    public function store(Request $request): Response
     {
         $validated = $request->validate([
+            'tenant_id' => ['required', 'string', 'exists:tenants,id'],
             'plan' => ['required', 'string', 'in:Starter,Professional,Enterprise'],
             'payment_method' => ['required', 'string', 'in:credit_card,bank_transfer,bca,mandiri,bni,bri'],
+            'amount' => ['required', 'numeric', 'min:1'],
         ]);
 
-        $amount = $this->getPlanPrice($validated['plan']);
+        $tenant = Tenant::findOrFail($validated['tenant_id']);
 
         // Create subscription record
         $subscription = Subscription::create([
             'tenant_id' => $tenant->id,
             'plan' => $validated['plan'],
-            'amount' => $amount,
+            'amount' => $validated['amount'],
             'status' => 'pending',
             'payment_method' => $validated['payment_method'],
             'payment_reference' => 'RENTIVO-' . strtoupper(uniqid()),
@@ -115,19 +50,18 @@ class TenantSignupController extends Controller
             // Prepare transaction details for Midtrans
             $transactionDetails = [
                 'order_id' => $subscription->payment_reference,
-                'gross_amount' => $amount,
+                'gross_amount' => $validated['amount'],
             ];
 
             $customerDetails = [
                 'first_name' => $tenant->data['company_name'] ?? 'Customer',
                 'email' => $tenant->data['email'] ?? 'customer@rentivo.my.id',
-                'phone' => $tenant->data['phone'] ?? '',
             ];
 
             $itemDetails = [
                 [
                     'id' => $validated['plan'],
-                    'price' => $amount,
+                    'price' => $validated['amount'],
                     'quantity' => 1,
                     'name' => 'Rentivo ' . $validated['plan'] . ' Plan Subscription',
                 ],
@@ -156,6 +90,8 @@ class TenantSignupController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Midtrans payment error: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal memproses pembayaran: ' . $e->getMessage(),
@@ -164,16 +100,48 @@ class TenantSignupController extends Controller
     }
 
     /**
-     * Get plan price based on plan type
+     * Handle successful subscription payment
      */
-    private function getPlanPrice(string $plan): float
+    public function success(Request $request): Response
     {
-        return match ($plan) {
-            'Starter' => 299000,
-            'Professional' => 799000,
-            'Enterprise' => 1999000,
-            default => 0,
-        };
+        $subscriptionId = $request->query('subscription');
+        
+        if ($subscriptionId) {
+            $subscription = Subscription::find($subscriptionId);
+            if ($subscription) {
+                $subscription->update([
+                    'status' => 'active',
+                    'paid_at' => now(),
+                ]);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pembayaran berhasil! Subscription Anda sudah aktif.',
+        ]);
+    }
+
+    /**
+     * Handle cancelled subscription payment
+     */
+    public function cancel(Request $request): Response
+    {
+        $subscriptionId = $request->query('subscription');
+        
+        if ($subscriptionId) {
+            $subscription = Subscription::find($subscriptionId);
+            if ($subscription) {
+                $subscription->update([
+                    'status' => 'cancelled',
+                ]);
+            }
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Pembayaran dibatalkan.',
+        ]);
     }
 
     /**

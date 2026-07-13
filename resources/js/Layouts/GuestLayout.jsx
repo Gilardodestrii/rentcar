@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Meta } from '@/Components/Meta';
 
 export default function GuestLayout({ children, settings = {} }) {
@@ -14,6 +14,25 @@ export default function GuestLayout({ children, settings = {} }) {
         <>
             <Meta title={`${companyName} - Car Rental SaaS`} description="Book cars easily with our rental service" />
             <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+                {/* Tawk.to Live Chat */}
+                {typeof window !== 'undefined' && (
+                    <script
+                        dangerouslySetInnerHTML={{
+                            __html: `
+                                var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+                                (function(){
+                                    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+                                    s1.async=true;
+                                    s1.src='https://embed.tawk.to/6698b8e79d6b8a39739b5f4e/1i4j36u2s';
+                                    s1.charset='UTF-8';
+                                    s1.setAttribute('crossorigin','*');
+                                    s0.parentNode.insertBefore(s1,s0);
+                                })();
+                            `,
+                        }}
+                    />
+                )}
+
                 {/* Header */}
                 <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
                     <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
