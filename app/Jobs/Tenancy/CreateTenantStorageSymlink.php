@@ -33,7 +33,7 @@ class CreateTenantStorageSymlink
             mkdir($target, 0775, true);
         }
 
-        if (!@symlink($target, $link) && !file_exists($link)) {
+        if (!@\symlink($target, $link) && !file_exists($link)) {
             throw new \RuntimeException("Failed to create symlink: {$target} -> {$link}");
         }
     }
