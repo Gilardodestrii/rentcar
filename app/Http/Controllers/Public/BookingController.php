@@ -35,7 +35,7 @@ class BookingController extends Controller
                 'brand' => $car->brand,
                 'model' => $car->model,
                 'price_per_day' => $car->price_per_day,
-                'photo' => $car->primaryPhoto ? asset('storage/' . $car->primaryPhoto->path) : null,
+                'photo' => $car->primaryPhoto ? \App\Helpers\StorageHelper::tenantAsset($car->primaryPhoto->path) : null,
             ] : null,
             'drivers' => $drivers,
         ]);
@@ -88,7 +88,7 @@ class BookingController extends Controller
                 'car' => [
                     'brand' => $booking->car->brand,
                     'model' => $booking->car->model,
-                    'photo' => $booking->car->primaryPhoto ? asset('storage/' . $booking->car->primaryPhoto->path) : null,
+                    'photo' => $booking->car->primaryPhoto ? \App\Helpers\StorageHelper::tenantAsset($booking->car->primaryPhoto->path) : null,
                 ],
                 'driver' => $booking->driver ? [
                     'name' => $booking->driver->name,

@@ -38,7 +38,7 @@ class SettingController extends Controller
         // Prefix storage path for images
         foreach (['site_logo', 'hero_image'] as $img) {
             if ($settings[$img]) {
-                $settings[$img . '_url'] = asset('storage/' . $settings[$img]);
+                $settings[$img . '_url'] = \App\Helpers\StorageHelper::tenantAsset($settings[$img]);
             }
         }
 

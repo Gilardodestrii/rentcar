@@ -45,7 +45,7 @@ class CarController extends Controller
             'transmission' => $car->transmission,
             'price_per_day' => $car->price_per_day,
             'status' => $car->status,
-            'primary_photo' => $car->primaryPhoto ? asset('storage/' . $car->primaryPhoto->path) : null,
+            'primary_photo' => $car->primaryPhoto ? \App\Helpers\StorageHelper::tenantAsset($car->primaryPhoto->path) : null,
             'bookings_count' => $car->bookings->count(),
         ]);
 
@@ -116,7 +116,7 @@ class CarController extends Controller
                 'description' => $car->description,
                 'photos' => $car->photos->map(fn($p) => [
                     'id' => $p->id,
-                    'url' => asset('storage/' . $p->path),
+                    'url' => \App\Helpers\StorageHelper::tenantAsset($p->path),
                     'is_primary' => $p->is_primary,
                 ]),
                 'recent_bookings' => $car->bookings->map(fn($b) => [
@@ -156,7 +156,7 @@ class CarController extends Controller
                 'description' => $car->description,
                 'photos' => $car->photos->map(fn($p) => [
                     'id' => $p->id,
-                    'url' => asset('storage/' . $p->path),
+                    'url' => \App\Helpers\StorageHelper::tenantAsset($p->path),
                     'is_primary' => $p->is_primary,
                 ]),
             ],

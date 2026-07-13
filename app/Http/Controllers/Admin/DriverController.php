@@ -34,7 +34,7 @@ class DriverController extends Controller
             'license_number' => $d->license_number,
             'daily_rate' => $d->daily_rate,
             'status' => $d->status,
-            'photo' => $d->photo ? asset('storage/' . $d->photo) : null,
+            'photo' => $d->photo ? \App\Helpers\StorageHelper::tenantAsset($d->photo) : null,
         ]);
 
         return inertia('Admin/Drivers/Index', [
@@ -79,7 +79,7 @@ class DriverController extends Controller
                 'license_number' => $driver->license_number,
                 'daily_rate' => $driver->daily_rate,
                 'status' => $driver->status,
-                'photo' => $driver->photo ? asset('storage/' . $driver->photo) : null,
+                'photo' => $driver->photo ? \App\Helpers\StorageHelper::tenantAsset($driver->photo) : null,
             ],
         ]);
     }

@@ -72,13 +72,13 @@ class BookingController extends Controller
                 'customer_name' => $booking->customer_name,
                 'customer_phone' => $booking->customer_phone,
                 'customer_email' => $booking->customer_email,
-                'ktp_path' => $booking->ktp_path ? asset('storage/' . $booking->ktp_path) : null,
+                'ktp_path' => $booking->ktp_path ? \App\Helpers\StorageHelper::tenantAsset($booking->ktp_path) : null,
                 'car' => $booking->car ? [
                     'id' => $booking->car->id,
                     'brand' => $booking->car->brand,
                     'model' => $booking->car->model,
                     'plate_number' => $booking->car->plate_number,
-                    'photo' => $booking->car->primaryPhoto ? asset('storage/' . $booking->car->primaryPhoto->path) : null,
+                    'photo' => $booking->car->primaryPhoto ? \App\Helpers\StorageHelper::tenantAsset($booking->car->primaryPhoto->path) : null,
                 ] : null,
                 'driver' => $booking->driver ? [
                     'id' => $booking->driver->id,
@@ -177,14 +177,14 @@ class BookingController extends Controller
                 'customer_name' => $booking->customer_name,
                 'customer_phone' => $booking->customer_phone,
                 'customer_email' => $booking->customer_email,
-                'ktp_path' => $booking->ktp_path ? asset('storage/' . $booking->ktp_path) : null,
+                'ktp_path' => $booking->ktp_path ? \App\Helpers\StorageHelper::tenantAsset($booking->ktp_path) : null,
                 'car' => $booking->car ? [
                     'id' => $booking->car->id,
                     'brand' => $booking->car->brand,
                     'model' => $booking->car->model,
                     'plate_number' => $booking->car->plate_number,
                     'price_per_day' => $booking->car->price_per_day,
-                    'photo' => $booking->car->primaryPhoto ? asset('storage/' . $booking->car->primaryPhoto->path) : null,
+                    'photo' => $booking->car->primaryPhoto ? \App\Helpers\StorageHelper::tenantAsset($booking->car->primaryPhoto->path) : null,
                 ] : null,
                 'driver' => $booking->driver ? [
                     'id' => $booking->driver->id,

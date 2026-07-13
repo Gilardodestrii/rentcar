@@ -69,7 +69,7 @@ class CatalogController extends Controller
             'capacity' => $car->capacity,
             'transmission' => $car->transmission,
             'price_per_day' => $car->price_per_day,
-            'photo' => $car->primaryPhoto ? asset('storage/' . $car->primaryPhoto->path) : null,
+            'photo' => $car->primaryPhoto ? \App\Helpers\StorageHelper::tenantAsset($car->primaryPhoto->path) : null,
         ]);
 
         return inertia('Public/Catalog', [
@@ -101,7 +101,7 @@ class CatalogController extends Controller
                 'description' => $car->description,
                 'photos' => $car->photos->map(fn($p) => [
                     'id' => $p->id,
-                    'url' => asset('storage/' . $p->path),
+                    'url' => \App\Helpers\StorageHelper::tenantAsset($p->path),
                     'is_primary' => $p->is_primary,
                 ]),
                 'average_rating' => $avgRating ? round($avgRating, 1) : null,

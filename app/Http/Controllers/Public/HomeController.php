@@ -26,7 +26,7 @@ class HomeController extends Controller
                 'capacity' => $car->capacity,
                 'transmission' => $car->transmission,
                 'price_per_day' => $car->price_per_day,
-                'photo' => $car->primaryPhoto ? asset('storage/' . $car->primaryPhoto->path) : null,
+                'photo' => $car->primaryPhoto ? \App\Helpers\StorageHelper::tenantAsset($car->primaryPhoto->path) : null,
             ]);
 
         // Approved testimonials (limit 6)
@@ -49,7 +49,7 @@ class HomeController extends Controller
             'site_tagline' => SiteSetting::get('site.tagline', 'Sistem Rental Mobil Professional'),
             'hero_title' => SiteSetting::get('hero.title', 'Rental Mobil Terpercaya'),
             'hero_subtitle' => SiteSetting::get('hero.subtitle', 'Armada lengkap, harga terjangkau'),
-            'hero_image' => SiteSetting::get('hero.image') ? asset('storage/' . SiteSetting::get('hero.image')) : null,
+            'hero_image' => SiteSetting::get('hero.image') ? \App\Helpers\StorageHelper::tenantAsset(SiteSetting::get('hero.image')) : null,
             'about_title' => SiteSetting::get('about.title', 'Tentang Kami'),
             'about_content' => SiteSetting::get('about.content'),
             'company_phone' => SiteSetting::get('company.phone'),
