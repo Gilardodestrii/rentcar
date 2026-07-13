@@ -108,7 +108,7 @@ export default function Landing() {
         },
         {
             question: 'Bagaimana sistem pembayarannya?',
-            answer: 'Pembayaran dapat dilakukan melalui transfer bank, kartu kredit, atau melalui payment gateway yang kami sediakan. Kami menggunakan Midtrans untuk memproses pembayaran secara aman.',
+            answer: 'Pembayaran dapat dilakukan melalui transfer bank, kartu kredit, atau melalui payment gateway Pakasir yang kami sediakan.',
         },
         {
             question: 'Apakah data kami aman?',
@@ -158,7 +158,7 @@ export default function Landing() {
         password_confirmation: '',
         phone: '',
         plan: 'professional',
-        payment_method: 'trial', // trial, transfer, bca, mandiri, bni, bri, qris
+        payment_method: 'trial',
     });
 
     const paymentMethods = [
@@ -189,7 +189,6 @@ export default function Landing() {
     const handleNewsletterSubmit = async (e) => {
         e.preventDefault();
         setIsSubscribing(true);
-        // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1500));
         setIsSubscribing(false);
         setSubscribeSuccess(true);
@@ -202,7 +201,7 @@ export default function Landing() {
     };
 
     return (
-        <>
+        <div>
             <Head title="Rentivo - Sistem Manajemen Rental Mobil SaaS" />
             <meta name="description" content="Rentivo adalah solusi SaaS terbaik untuk bisnis rental mobil Anda. Kelola armada, pemesanan, dan pembayaran dengan mudah." />
             <meta name="keywords" content="rental mobil, saas, manajemen rental, sistem rental mobil, software rental mobil" />
@@ -524,6 +523,7 @@ export default function Landing() {
                     </div>
                     <div className="bg-white rounded-2xl p-8 shadow-lg">
                         <form onSubmit={handleSubmit} className="space-y-6">
+                            {/* Row 1: Company Name + Slug */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label htmlFor="company_name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -565,6 +565,8 @@ export default function Landing() {
                                     )}
                                 </div>
                             </div>
+
+                            {/* Row 2: Name + Email */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -601,6 +603,8 @@ export default function Landing() {
                                     )}
                                 </div>
                             </div>
+
+                            {/* Row 3: Phone */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
@@ -614,45 +618,51 @@ export default function Landing() {
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                                         placeholder="+62 812-3456-7890"
                                     />
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label htmlFor="plan" className="block text-sm font-medium text-gray-700 mb-1">
-                                            Pilih Paket
-                                        </label>
-                                        <select
-                                            id="plan"
-                                            value={data.plan}
-                                            onChange={(e) => setData('plan', e.target.value)}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                                        >
-                                            <option value="starter">Starter - Rp 299.000/bulan</option>
-                                            <option value="professional">Professional - Rp 799.000/bulan</option>
-                                            <option value="enterprise">Enterprise - Rp 1.999.000/bulan</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label htmlFor="payment_method" className="block text-sm font-medium text-gray-700 mb-1">
-                                            Metode Pembayaran
-                                        </label>
-                                        <select
-                                            id="payment_method"
-                                            value={data.payment_method}
-                                            onChange={(e) => setData('payment_method', e.target.value)}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                                        >
-                                            {paymentMethods.map((method) => (
-                                                <option key={method.id} value={method.id}>
-                                                    {method.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        {data.payment_method !== 'trial' && (
-                                            <p className="mt-1 text-xs text-gray-500">
-                                                Anda akan diarahkan ke halaman pembayaran Pakasir
-                                            </p>
-                                        )}
-                                    </div>
                                 </div>
+                            </div>
+
+                            {/* Row 4: Plan + Payment Method */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label htmlFor="plan" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Pilih Paket
+                                    </label>
+                                    <select
+                                        id="plan"
+                                        value={data.plan}
+                                        onChange={(e) => setData('plan', e.target.value)}
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                                    >
+                                        <option value="starter">Starter - Rp 299.000/bulan</option>
+                                        <option value="professional">Professional - Rp 799.000/bulan</option>
+                                        <option value="enterprise">Enterprise - Rp 1.999.000/bulan</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label htmlFor="payment_method" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Metode Pembayaran
+                                    </label>
+                                    <select
+                                        id="payment_method"
+                                        value={data.payment_method}
+                                        onChange={(e) => setData('payment_method', e.target.value)}
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                                    >
+                                        {paymentMethods.map((method) => (
+                                            <option key={method.id} value={method.id}>
+                                                {method.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {data.payment_method !== 'trial' && (
+                                        <p className="mt-1 text-xs text-gray-500">
+                                            Anda akan diarahkan ke halaman pembayaran Pakasir
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Row 5: Password + Confirmation */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
@@ -686,6 +696,8 @@ export default function Landing() {
                                     />
                                 </div>
                             </div>
+
+                            {/* Terms Checkbox */}
                             <div className="flex items-center">
                                 <input
                                     id="terms"
@@ -697,6 +709,8 @@ export default function Landing() {
                                     Saya setuju dengan <Link href="#" className="text-blue-600 hover:underline">Syarat & Ketentuan</Link> dan <Link href="#" className="text-blue-600 hover:underline">Kebijakan Privasi</Link>
                                 </label>
                             </div>
+
+                            {/* Submit Button */}
                             <button
                                 type="submit"
                                 disabled={processing}
@@ -744,19 +758,19 @@ export default function Landing() {
                                 Solusi SaaS untuk bisnis rental mobil terpercaya di Indonesia.
                             </p>
                             <div className="flex space-x-4">
-                                <a href="#" className="text-gray-400 hover:text-white transition">
+                                <a href="#" className="text-gray-400 hover:text-white">
                                     <span className="sr-only">Facebook</span>
                                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                         <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" />
                                     </svg>
                                 </a>
-                                <a href="#" className="text-gray-400 hover:text-white transition">
+                                <a href="#" className="text-gray-400 hover:text-white">
                                     <span className="sr-only">Instagram</span>
                                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                         <path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.024.06 1.378.06 3.808s-.012 2.784-.06 3.808c-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.024.048-1.378.06-3.808.06s-2.784-.013-3.808-.06c-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.048-1.024-.06-1.378-.06-3.808s.012-2.784.06-3.808c.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 016.08 2.525c.636-.247 1.363-.416 2.427-.465C9.53 2.013 9.884 2 12.315 2zM12 7a5 5 0 100 10 5 5 0 000-10zm0 8a3 3 0 110-6 3 3 0 010 6zm6.406-11.845a1.25 1.25 0 100 2.5 1.25 1.25 0 000-2.5z" clipRule="evenodd" />
                                     </svg>
                                 </a>
-                                <a href="#" className="text-gray-400 hover:text-white transition">
+                                <a href="#" className="text-gray-400 hover:text-white">
                                     <span className="sr-only">WhatsApp</span>
                                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c.003 5.45-4.437 9.884-9.885 9.884m-8.413-18.297a1.162 1.162 0 01.832 1.842 1.162 1.162 0 01-.832-1.842m8.417 18.297a1.162 1.162 0 01-.832-1.842 1.162 1.162 0 01.832 1.842" />
@@ -767,25 +781,25 @@ export default function Landing() {
                         <div>
                             <h3 className="text-lg font-semibold mb-4">Produk</h3>
                             <ul className="space-y-2">
-                                <li><Link href="#" className="text-gray-400 hover:text-white transition">Fitur</Link></li>
-                                <li><Link href="#pricing" className="text-gray-400 hover:text-white transition">Harga</Link></li>
-                                <li><Link href="#demo" className="text-gray-400 hover:text-white transition">Demo</Link></li>
+                                <li><a href="#" className="text-gray-400 hover:text-white">Fitur</a></li>
+                                <li><a href="#pricing" className="text-gray-400 hover:text-white">Harga</a></li>
+                                <li><a href="#demo" className="text-gray-400 hover:text-white">Demo</a></li>
                             </ul>
                         </div>
                         <div>
                             <h3 className="text-lg font-semibold mb-4">Perusahaan</h3>
                             <ul className="space-y-2">
-                                <li><Link href="#" className="text-gray-400 hover:text-white transition">Tentang Kami</Link></li>
-                                <li><Link href="#" className="text-gray-400 hover:text-white transition">Blog</Link></li>
-                                <li><Link href="#" className="text-gray-400 hover:text-white transition">Kontak</Link></li>
+                                <li><a href="#" className="text-gray-400 hover:text-white">Tentang Kami</a></li>
+                                <li><a href="#" className="text-gray-400 hover:text-white">Blog</a></li>
+                                <li><a href="#" className="text-gray-400 hover:text-white">Kontak</a></li>
                             </ul>
                         </div>
                         <div>
                             <h3 className="text-lg font-semibold mb-4">Bantuan</h3>
                             <ul className="space-y-2">
-                                <li><Link href="#" className="text-gray-400 hover:text-white transition">Dokumentasi</Link></li>
-                                <li><Link href="#" className="text-gray-400 hover:text-white transition">FAQ</Link></li>
-                                <li><Link href="#" className="text-gray-400 hover:text-white transition">Support</Link></li>
+                                <li><a href="#" className="text-gray-400 hover:text-white">Dokumentasi</a></li>
+                                <li><a href="#" className="text-gray-400 hover:text-white">FAQ</a></li>
+                                <li><a href="#" className="text-gray-400 hover:text-white">Support</a></li>
                             </ul>
                         </div>
                     </div>
@@ -794,6 +808,6 @@ export default function Landing() {
                     </div>
                 </div>
             </footer>
-        </>
+        </div>
     );
 }
