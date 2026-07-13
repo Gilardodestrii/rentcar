@@ -18,13 +18,11 @@ class CreateTenantStorageSymlink
     {
         $tenantId = $this->tenant->getTenantKey();
 
-        $target = storage_path("../../tenantking/../{$tenantId}/app/public");
-        // Absolute path: storage/{tenantId}/app/public
         $target = base_path("storage/{$tenantId}/app/public");
         $link   = public_path("tenant-storage/{$tenantId}");
 
         if (is_link($link)) {
-            return; // already exists
+            return;
         }
 
         if (!is_dir(dirname($link))) {
