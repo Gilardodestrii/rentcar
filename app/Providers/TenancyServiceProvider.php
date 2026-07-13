@@ -103,19 +103,19 @@ class TenancyServiceProvider extends ServiceProvider
         $this->bootEvents();
         $this->mapRoutes();
 
-        // Dynamic tenant disk
-        Event::listen(Events\TenancyBootstrapped::class, function (Events\TenancyBootstrapped $event) {
-            $tenant = $event->tenancy->tenant;
-            config([
-                'filesystems.disks.tenant' => [
-                    'driver' => 'local',
-                    'root' => storage_path("{$tenant->getTenantKey()}/app/public"),
-                    'url' => rtrim(config('app.url'), '/')."/tenant-storage/{$tenant->getTenantKey()}",
-                    'visibility' => 'public',
-                    'throw' => false,
-                ],
-            ]);
-        });
+        // Dynamic tenant disk - disabled temporarily
+        // Event::listen(Events\TenancyBootstrapped::class, function (Events\TenancyBootstrapped $event) {
+        //     $tenant = $event->tenancy->tenant;
+        //     config([
+        //         'filesystems.disks.tenant' => [
+        //             'driver' => 'local',
+        //             'root' => storage_path("{$tenant->getTenantKey()}/app/public"),
+        //             'url' => rtrim(config('app.url'), '/')."/tenant-storage/{$tenant->getTenantKey()}",
+        //             'visibility' => 'public',
+        //             'throw' => false,
+        //         ],
+        //     ]);
+        // });
 
         $this->makeTenancyMiddlewareHighestPriority();
     }
