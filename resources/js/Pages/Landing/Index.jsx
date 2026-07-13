@@ -157,15 +157,28 @@ export default function Landing() {
         password: '',
         password_confirmation: '',
         phone: '',
-        plan: 'Professional',
+        plan: 'professional',
+        payment_method: 'trial', // trial, transfer, bca, mandiri, bni, bri, qris
     });
+
+    const paymentMethods = [
+        { id: 'trial', name: 'Coba Gratis (7 Hari)' },
+        { id: 'transfer', name: 'Transfer Bank' },
+        { id: 'bca', name: 'BCA' },
+        { id: 'mandiri', name: 'Mandiri' },
+        { id: 'bni', name: 'BNI' },
+        { id: 'bri', name: 'BRI' },
+        { id: 'qris', name: 'QRIS' },
+    ];
 
     const handleSubmit = (e) => {
         e.preventDefault();
         post(route('tenants.store'), {
             onSuccess: () => {
                 reset();
-                window.location.href = '/daftar?success=1';
+                if (data.payment_method === 'trial') {
+                    window.location.href = '/daftar?success=1';
+                }
             },
             onError: () => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -601,23 +614,45 @@ export default function Landing() {
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                                         placeholder="+62 812-3456-7890"
                                     />
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label htmlFor="plan" className="block text-sm font-medium text-gray-700 mb-1">
+                                            Pilih Paket
+                                        </label>
+                                        <select
+                                            id="plan"
+                                            value={data.plan}
+                                            onChange={(e) => setData('plan', e.target.value)}
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                                        >
+                                            <option value="starter">Starter - Rp 299.000/bulan</option>
+                                            <option value="professional">Professional - Rp 799.000/bulan</option>
+                                            <option value="enterprise">Enterprise - Rp 1.999.000/bulan</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="payment_method" className="block text-sm font-medium text-gray-700 mb-1">
+                                            Metode Pembayaran
+                                        </label>
+                                        <select
+                                            id="payment_method"
+                                            value={data.payment_method}
+                                            onChange={(e) => setData('payment_method', e.target.value)}
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                                        >
+                                            {paymentMethods.map((method) => (
+                                                <option key={method.id} value={method.id}>
+                                                    {method.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {data.payment_method !== 'trial' && (
+                                            <p className="mt-1 text-xs text-gray-500">
+                                                Anda akan diarahkan ke halaman pembayaran Pakasir
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
-                                <div>
-                                    <label htmlFor="plan" className="block text-sm font-medium text-gray-700 mb-1">
-                                        Pilih Paket
-                                    </label>
-                                    <select
-                                        id="plan"
-                                        value={data.plan}
-                                        onChange={(e) => setData('plan', e.target.value)}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                                    >
-                                        <option value="Starter">Starter - Rp 299.000/bulan</option>
-                                        <option value="Professional">Professional - Rp 799.000/bulan</option>
-                                        <option value="Enterprise">Enterprise - Rp 1.999.000/bulan</option>
-                                    </select>
-                                </div>
-                            </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">

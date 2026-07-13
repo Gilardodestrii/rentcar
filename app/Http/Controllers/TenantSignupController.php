@@ -2,33 +2,71 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Subscription;
 use App\Models\Tenant;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
-use Midtrans\Config as MidtransConfig;
-use Midtrans\Snap;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class TenantSignupController extends Controller
 {
-    public function __construct()
-    {
-        // Initialize Midtrans configuration
-        MidtransConfig::$serverKey = config('midtrans.server_key');
-        MidtransConfig::$isProduction = config('midtrans.is_production', false);
-        MidtransConfig::$isSanitized = true;
-        MidtransConfig::$is3ds = true;
-    }
-
     public function create(): Response
     {
         return Inertia::render('Central/TenantSignup', [
             'baseDomain' => config('app.central_domain', parse_url(config('app.url'), PHP_URL_HOST)),
+            'plans' => [
+                [
+                    'id' => 'starter',
+                    'name' => 'Starter',
+                    'price' => 299000,
+                    'price_formatted' => 'Rp 299.000',
+                    'period' => '/bulan',
+                    'features' => [
+                        '1 Domain Tenant',
+                        '10 Kendaraan',
+                        '100 Pemesanan/Bulan',
+                        'Dashboard Basic',
+                        'Email Support',
+                    ],
+                ],
+                [
+                    'id' => 'professional',
+                    'name' => 'Professional',
+                    'price' => 799000,
+                    'price_formatted' => 'Rp 799.000',
+                    'period' => '/bulan',
+                    'features' => [
+                        '5 Domain Tenant',
+                        '50 Kendaraan',
+                        '1000 Pemesanan/Bulan',
+                        'Dashboard Advanced',
+                        'Email & Chat Support',
+                        'Custom Domain',
+                    ],
+                    'popular' => true,
+                ],
+                [
+                    'id' => 'enterprise',
+                    'name' => 'Enterprise',
+                    'price' => 1999000,
+                    'price_formatted' => 'Rp 1.999.000',
+                    'period' => '/bulan',
+                    'features' => [
+                        'Unlimited Domain Tenant',
+                        'Unlimited Kendaraan',
+                        'Unlimited Pemesanan',
+                        'Dashboard Full Feature',
+                        'Email, Chat & Phone Support',
+                        'Custom Domain',
+                        'API Access',
+                        'Priority Support',
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -50,11 +88,13 @@ class TenantSignupController extends Controller
             'email' => ['required', 'email', 'max:100'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'phone' => ['nullable', 'string', 'max:20'],
-            'plan' => ['required', 'string', 'in:Starter,Professional,Enterprise'],
+            'plan' => ['required', 'string', 'in:starter,professional,enterprise'],
+            'payment_method' => ['nullable', 'string', 'in:transfer,bca,mandiri,bni,bri,qris'],
         ]);
 
         $domain = "{$validated['slug']}.{$baseDomain}";
 
+        // Buat tenant baru
         $tenant = Tenant::create([
             'id' => $validated['slug'],
             'data' => [
@@ -62,11 +102,14 @@ class TenantSignupController extends Controller
                 'phone' => $validated['phone'],
                 'email' => $validated['email'],
                 'plan' => $validated['plan'],
+                'subscription_status' => 'trial',
+                'trial_expires_at' => now()->addDays(7)->toDateTimeString(),
             ],
         ]);
 
         $tenant->domains()->create(['domain' => $domain]);
 
+        // Buat user untuk tenant
         tenancy()->initialize($tenant);
         User::create([
             'name' => $validated['name'],
@@ -75,92 +118,34 @@ class TenantSignupController extends Controller
         ]);
         tenancy()->end();
 
-        // Create subscription with trial period
-        Subscription::create([
-            'tenant_id' => $tenant->id,
-            'plan' => $validated['plan'],
-            'amount' => $this->getPlanPrice($validated['plan']),
-            'status' => 'trial',
-            'payment_method' => 'trial',
-            'payment_reference' => 'TRIAL-' . strtoupper(uniqid()),
-            'expires_at' => now()->addDays(7),
-        ]);
+        // Jika pilih bayar sekarang, buat transaksi Pakasir
+        if ($request->filled('payment_method') && $request->payment_method !== 'trial') {
+            $amount = $this->getPlanPrice($validated['plan']);
 
-        return Inertia::location("https://{$domain}/login");
-    }
-
-    /**
-     * Create subscription with payment for existing tenant
-     */
-    public function createSubscription(Request $request, Tenant $tenant): SymfonyResponse
-    {
-        $validated = $request->validate([
-            'plan' => ['required', 'string', 'in:Starter,Professional,Enterprise'],
-            'payment_method' => ['required', 'string', 'in:credit_card,bank_transfer,bca,mandiri,bni,bri'],
-        ]);
-
-        $amount = $this->getPlanPrice($validated['plan']);
-
-        // Create subscription record
-        $subscription = Subscription::create([
-            'tenant_id' => $tenant->id,
-            'plan' => $validated['plan'],
-            'amount' => $amount,
-            'status' => 'pending',
-            'payment_method' => $validated['payment_method'],
-            'payment_reference' => 'RENTIVO-' . strtoupper(uniqid()),
-        ]);
-
-        try {
-            // Prepare transaction details for Midtrans
-            $transactionDetails = [
-                'order_id' => $subscription->payment_reference,
-                'gross_amount' => $amount,
-            ];
-
-            $customerDetails = [
-                'first_name' => $tenant->data['company_name'] ?? 'Customer',
-                'email' => $tenant->data['email'] ?? 'customer@rentivo.my.id',
-                'phone' => $tenant->data['phone'] ?? '',
-            ];
-
-            $itemDetails = [
-                [
-                    'id' => $validated['plan'],
-                    'price' => $amount,
-                    'quantity' => 1,
-                    'name' => 'Rentivo ' . $validated['plan'] . ' Plan Subscription',
-                ],
-            ];
-
-            $transaction = [
-                'transaction_details' => $transactionDetails,
-                'customer_details' => $customerDetails,
-                'item_details' => $itemDetails,
-                'enabled_payments' => [$validated['payment_method']],
-                'callbacks' => [
-                    'finish' => route('subscribe.success', ['subscription' => $subscription->id]),
-                    'error' => route('subscribe.cancel', ['subscription' => $subscription->id]),
-                    'pending' => route('subscribe.success', ['subscription' => $subscription->id]),
-                ],
-            ];
-
-            // Get Snap token
-            $snapToken = Snap::getSnapToken($transaction);
-
-            return response()->json([
-                'success' => true,
-                'snap_token' => $snapToken,
-                'subscription_id' => $subscription->id,
-                'redirect_url' => $this->getMidtransRedirectUrl($snapToken),
+            // Buat transaksi
+            $transaction = Transaction::create([
+                'tenant_id' => $tenant->id,
+                'order_id' => 'RENTIVO-' . strtoupper(uniqid()),
+                'plan' => $validated['plan'],
+                'amount' => $amount,
+                'status' => 'pending',
+                'payment_method' => $validated['payment_method'],
+                'expired_at' => now()->addHours(24),
             ]);
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal memproses pembayaran: ' . $e->getMessage(),
-            ], 500);
+            // Redirect ke halaman pembayaran Pakasir
+            return Inertia::location(route('pakasir.create', [
+                'tenant_id' => $tenant->id,
+                'plan' => $validated['plan'],
+                'amount' => $amount,
+                'customer_name' => $validated['company_name'],
+                'customer_email' => $validated['email'],
+                'customer_phone' => $validated['phone'] ?? '',
+            ]));
         }
+
+        // Jika trial, langsung redirect ke login tenant
+        return Inertia::location("https://{$domain}/login");
     }
 
     /**
@@ -169,22 +154,10 @@ class TenantSignupController extends Controller
     private function getPlanPrice(string $plan): float
     {
         return match ($plan) {
-            'Starter' => 299000,
-            'Professional' => 799000,
-            'Enterprise' => 1999000,
+            'starter' => 299000,
+            'professional' => 799000,
+            'enterprise' => 1999000,
             default => 0,
         };
-    }
-
-    /**
-     * Get Midtrans redirect URL from snap token
-     */
-    private function getMidtransRedirectUrl(string $snapToken): string
-    {
-        if (config('midtrans.is_production')) {
-            return 'https://app.midtrans.com/snap/v2/vtweb/' . $snapToken;
-        }
-
-        return 'https://app.sandbox.midtrans.com/snap/v2/vtweb/' . $snapToken;
     }
 }

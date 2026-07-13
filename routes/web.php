@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\PakasirController;
 use App\Http\Controllers\TenantSignupController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -18,8 +18,9 @@ Route::domain(config('app.central_domain'))->group(function () {
     Route::get('/daftar', [TenantSignupController::class, 'create'])->name('tenants.create');
     Route::post('/daftar', [TenantSignupController::class, 'store'])->name('tenants.store');
 
-    // Subscription routes
-    Route::post('/subscribe', [SubscriptionController::class, 'store'])->name('subscribe');
-    Route::get('/subscribe/success', [SubscriptionController::class, 'success'])->name('subscribe.success');
-    Route::get('/subscribe/cancel', [SubscriptionController::class, 'cancel'])->name('subscribe.cancel');
+    // Pakasir Payment Routes
+    Route::post('/pakasir/create', [PakasirController::class, 'createTransaction'])->name('pakasir.create');
+    Route::post('/pakasir/callback', [PakasirController::class, 'callback'])->name('pakasir.callback');
+    Route::get('/pakasir/return', [PakasirController::class, 'return'])->name('pakasir.return');
 });
+
