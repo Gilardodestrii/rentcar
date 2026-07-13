@@ -122,19 +122,9 @@ class TenantSignupController extends Controller
         if ($request->filled('payment_method') && $request->payment_method !== 'trial') {
             $amount = $this->getPlanPrice($validated['plan']);
 
-            // Buat transaksi
-            $transaction = Transaction::create([
-                'tenant_id' => $tenant->id,
-                'order_id' => 'RENTIVO-' . strtoupper(uniqid()),
-                'plan' => $validated['plan'],
-                'amount' => $amount,
-                'status' => 'pending',
-                'payment_method' => $validated['payment_method'],
-                'expired_at' => now()->addHours(24),
-            ]);
-
-            // Redirect ke halaman pembayaran Pakasir
-            return Inertia::location(route('pakasir.create', [
+            // Panggil Pakasir API langsung (bukan redirect)
+            $pakasirController = new \App\Http\Controllers\PakasirController();
+            $response = $pakasirController->createTransaction(new Request([
                 'tenant_id' => $tenant->id,
                 'plan' => $validated['plan'],
                 'amount' => $amount,
@@ -142,6 +132,17 @@ class TenantSignupController extends Controller
                 'customer_email' => $validated['email'],
                 'customer_phone' => $validated['phone'] ?? '',
             ]));
+
+            $data = $response->getData();
+
+            if ($data->success ?? false) {
+                // Redirect ke URL pembayaran Pakasir
+                return Inertia::location($data->payment_url);
+            }
+
+            // Jika gagal, hapus tenant dan return error
+            $tenant->delete();
+            return back()->withErrors(['payment' => $data->message ?? 'Gagal membuat transaksi']);
         }
 
         // Jika trial, langsung redirect ke login tenant

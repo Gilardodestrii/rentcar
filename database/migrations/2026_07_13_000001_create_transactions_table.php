@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained()->onDelete('cascade');
+            $table->string('tenant_id'); // Ubah ke string (sama kayak tenants.id)
             $table->string('order_id')->unique();
             $table->string('plan'); // starter, professional, enterprise
             $table->decimal('amount', 12, 2);
@@ -20,6 +20,11 @@ return new class extends Migration
             $table->json('payment_data')->nullable();
             $table->timestamp('expired_at')->nullable();
             $table->timestamps();
+
+            $table->foreign('tenant_id')
+                  ->references('id')
+                  ->on('tenants')
+                  ->onDelete('cascade');
         });
     }
 

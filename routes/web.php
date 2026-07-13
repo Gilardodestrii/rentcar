@@ -15,10 +15,8 @@ Route::domain(config('app.central_domain'))->group(function () {
         return Inertia::render('Landing/Index', ['scrollTo' => 'pricing']);
     })->name('pricing');
 
-    Route::get('/daftar', [TenantSignupController::class, 'create'])->name('tenants.create');
-    Route::post('/daftar', [TenantSignupController::class, 'store'])->name('tenants.store');
-
     // Pakasir Payment Routes
+    Route::post('/daftar', [TenantSignupController::class, 'store'])->name('tenants.store');
     Route::post('/pakasir/create', [PakasirController::class, 'createTransaction'])->name('pakasir.create');
     Route::post('/pakasir/callback', [PakasirController::class, 'callback'])->name('pakasir.callback');
     Route::get('/pakasir/return', [PakasirController::class, 'return'])->name('pakasir.return');
