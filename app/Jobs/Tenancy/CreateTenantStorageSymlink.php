@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Tenancy;
 
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
 
@@ -11,27 +12,27 @@ class CreateTenantStorageSymlink
 
     public function __construct(public TenantWithDatabase $tenant) {}
 
-    public function handle(): void
+    public function handle(Filesystem $filesystem): void
     {
         $tenantId = $this->tenant->getTenantKey();
 
         $target = base_path("storage/{$tenantId}/app/public");
         $link   = public_path("tenant-storage/{$tenantId}");
 
-        if (is_link($link)) {
+        if ($filesystem->isDirectory($link)) {
             return;
         }
 
-        if (!is_dir(dirname($link))) {
-            mkdir(dirname($link), 0775, true);
+        if (!$filesystem->isDirectory(dirname($link))) {
+            $filesystem->makeDirectory(dirname($link), 0775, true);
         }
 
-        if (!is_dir($target)) {
-            mkdir($target, 0775, true);
+        if (!$filesystem->isDirectory($target)) {
+            $filesystem->makeDirectory($target, 0775, true);
         }
 
-        if (!@\symlink($target, $link) && !file_exists($link)) {
-            throw new \RuntimeException("Failed to create symlink: {$target} -> {$link}");
+        if (!$filesystem->exists($link)) {
+            $filesystem->link($target, $link);
         }
     }
 }
